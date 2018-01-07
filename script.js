@@ -1,4 +1,6 @@
-// dataset
+// source code for creating orthographic projection with versor dragging:
+// https://bl.ocks.org/mbostock/7ea1dde508cec6d2d95306f92642bc42
+// https://bl.ocks.org/curran/0bb64d8f56042e2480c908b0985f063b
 
 const dataset = [
     [
@@ -1102,58 +1104,86 @@ const dataset = [
       18064.7
     ]
   ];
-let w = 1000;
-const h = 600;
-const padding = 60;
+const w = window.innerWidth;
+const h = window.innerHeight;
+const svg = d3.select('body')
+  .append('svg')
+  .attr('width', w)
+  .attr('height', h);
+const translateX = w / 2;
+const translateY = h / 2;
+const widthScale = w / 960;
+const heightScale = h / 500;
+let initialScale = widthScale < heightScale ? widthScale * 300 : heightScale * 300;
 
-const formatDate = d3.timeFormat("%b %Y");
-const formatCurrency = d3.format("$,.2f");
+const path = svg.append('path').attr('stroke', 'gray');
+const g = svg.append('g');
+const projection = d3.geoOrthographic()
+  .translate([translateX, translateY])
+  .scale(initialScale);
 
-const maxVal = d3.max(dataset, (d) => d[1]);
-const yScale = d3.scaleLinear()
-                 .domain([0, maxVal])
-                 .range([h - padding, padding]);
-const maxDate = d3.max(dataset, (d) => new Date(d[0]));
-const minDate = d3.min(dataset, (d) => new Date(d[0]));
-const xScale = d3.scaleTime()
-                 .domain([minDate, maxDate])
-                 .range([padding, w - padding]);
-const xAxis = d3.axisBottom(xScale);
-const yAxis = d3.axisLeft(yScale);
+const geoPath = d3.geoPath().projection(projection);
+let moving = false;
+const rValue = d => d.population;
+const rScale = d3.scaleSqrt().range([0, 5]);
+d3.queue()
+  .defer(d3.json, 'https://unpkg.com/world-atlas@1/world/110m.json')
+  .defer(d3.json, 'https://unpkg.com/world-atlas@1/world/50m.json')
+  .await((error, world110m, world50m) => {
+    const countries110m = topojson
+      .feature(world110m, world110m.objects.countries);
+    const countries50m = topojson
+      .feature(world50m, world50m.objects.countries);
 
-const tip = d3.tip()
-  .attr('class', 'd3-tip')
-  .offset([-10, 0])
-  .html((d) => {
-  	return "<div class='tip-qty'>" + formatCurrency(d[1]) +" Billion</div><div class='tip-date'>" + formatDate(new Date(d[0])) + "</div>";
+    const render = () => {
+
+      // Render low resolution boundaries when moving,
+      // render high resolution boundaries when stopped.
+      path.attr('d', geoPath(moving ? countries110m : countries50m));
+
+      const point = {
+        type: 'Point',
+        coordinates: [0, 0]
+      };
+    };
+    render();
+
+    let rotate0, coords0;
+    const coords = () => projection.rotate(rotate0)
+      .invert([d3.event.x, d3.event.y]);
+
+    svg
+      .call(d3.drag()
+        .on('start', () => {
+          rotate0 = projection.rotate();
+          coords0 = coords();
+          moving = true;
+        })
+        .on('drag', () => {
+          const coords1 = coords();
+          projection.rotate([
+            rotate0[0] + coords1[0] - coords0[0],
+            rotate0[1] + coords1[1] - coords0[1],
+          ])
+          render();
+        })
+        .on('end', () => {
+          moving = false;
+          render();
+        })
+        .filter(() => !(d3.event.touches && d3.event.touches.length === 2))
+      )
+      .call(d3.zoom()
+        .on('zoom', () => {
+          projection.scale(initialScale * d3.event.transform.k);
+          render();
+        })
+        .on('start', () => {
+          moving = true;
+        })
+        .on('end', () => {
+          moving = false;
+          render();
+        })
+      )
   });
-
-const svg = d3.select("body")
-	.append("svg")
-	.attr("width", w)
-	.attr("height", h)
-	.attr("class", "chart")
-	.attr("id", "chart");
-
-svg.call(tip);
-
-svg.selectAll("rect")
-	.data(dataset)
-	.enter()
-	.append("rect")
-	.attr("x", (d) => xScale(new Date(d[0])))
-	.attr("y", (d) => yScale(d[1]))
-	.attr("width", 9)
-  .attr("height", (d, i) => h - padding - yScale(d[1]))
-  .attr("fill", "DarkBlue")
-  .attr("class", "bar")
-  .on('mouseover', tip.show)
-  .on('mouseout', tip.hide);
-
-svg.append("g")
-   .attr("transform", `translate(0, ${h - padding})`)
-   .call(xAxis);
-
-svg.append("g")
-   .attr("transform", `translate(${padding}, 0)`)
-   .call(yAxis);
