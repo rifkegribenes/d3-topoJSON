@@ -1,43 +1,17 @@
 /* style.css */
 
 body {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: middle;
 	font-family: 'Titillium Web', sans-serif;
-  background: #fcfcfa;
-}
-
-.stroke {
-  fill: none;
-  stroke: #000;
-  stroke-width: 1px;
-}
-
-.fill {
-  fill: lightblue;
-}
-
-.graticule {
-  fill: none;
-  stroke: #777;
-  stroke-width: .5px;
-  stroke-opacity: .5;
-}
-
-.land {
-  fill: darkgreen;
+  margin: 0;
+  padding: 0;
 }
 
 .water {
-  fill: lightblue;
+  background: #4196f6;
 }
 
-.boundary {
-  fill: none;
-  stroke: #fff;
-  stroke-width: .5px;
+svg {
+  fill: #4196f6;
 }
 
 .d3-tip {

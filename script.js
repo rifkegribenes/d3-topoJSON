@@ -22,7 +22,7 @@
 
 
 
-let width = window.innerWidth * .97;
+let width = window.innerWidth;
 let height = width / 2;
 const svg = d3.select("body").append("svg")
 
@@ -36,13 +36,14 @@ const path = d3.geoPath().projection(projection);
 
 //Resize function
 const resize = () => {
-  width = window.innerWidth * .97;
+  width = window.innerWidth;
   height = width / 2;
 
   d3.selectAll("path").attr("transform", `scale(${width / 1900 })`);
   svg
     .attr("width", width)
     .attr("height", height);
+
 
   // projection
   //   .translate([780,360])
@@ -59,14 +60,18 @@ const url = "https://unpkg.com/world-atlas@1/world/110m.json";
 
   svg
     .attr("width", width)
-    .attr("height", height);
+    .attr("height", height)
+    .append('rect')
+    .attr("width", width)
+    .attr("height", height)
+    .style("fill", "#4196f6");
 
   //draw map
   const map = svg.selectAll("path")
     .data(topojson.feature(world, world.objects.countries).features)
     .enter()
     .append('path')
-    .attr('fill', '#95E1D3')
+    .attr('fill', '#ddd')
     .attr('stroke', '#266D98')
     .attr('d', path);
   })
