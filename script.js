@@ -53,9 +53,9 @@ const resize = () => {
   //  d3.selectAll("path").attr('d', path);
 }
 
-const url = "http://enjalot.github.io/wwsd/data/world/world-110m.geojson";
+const url = "https://unpkg.com/world-atlas@1/world/110m.json";
 
- d3.json(url, (err, geojson) => {
+ d3.json(url, (err, world) => {
 
   svg
     .attr("width", width)
@@ -63,11 +63,12 @@ const url = "http://enjalot.github.io/wwsd/data/world/world-110m.geojson";
 
   //draw map
   const map = svg.selectAll("path")
-    .data(geojson.features)
+    .data(topojson.feature(world, world.objects.countries).features)
     .enter()
-    .append("path")
-    .attr("d", path(geojson))
-    .style("fill", "#3498db");
+    .append('path')
+    .attr('fill', '#95E1D3')
+    .attr('stroke', '#266D98')
+    .attr('d', path);
   })
 
 
