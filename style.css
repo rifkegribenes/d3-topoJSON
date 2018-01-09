@@ -16,7 +16,7 @@ body {
 }
 
 .fill {
-  fill: #f2f2f2;
+  fill: lightblue;
 }
 
 .graticule {
@@ -27,7 +27,11 @@ body {
 }
 
 .land {
-  fill: darkgrey;
+  fill: darkgreen;
+}
+
+.water {
+  fill: lightblue;
 }
 
 .boundary {
