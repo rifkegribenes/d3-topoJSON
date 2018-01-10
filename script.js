@@ -10,17 +10,20 @@ const svg = d3.select('body').append('svg')
   .attr('height', height);
 
 const projection = d3.geoMercator()
-  .translate([780,360])
-  .scale(300);
+  .scale(width / 2 / Math.PI)
+  .translate([width / 2, height / 2]);
 
 const path = d3.geoPath().projection(projection);
+
+const water = svg.append('rect')
+  .attr("width", width)
+  .attr("height", height)
+  .style("fill", "#4196f6");
+
 const borders = svg.append("g")
   .attr('width', width)
   .attr('height', height)
-  // .append('rect')
-  // .attr("width", width)
-  // .attr("height", height)
-  // .style("fill", "#4196f6");
+
 
 d3.queue()
   .defer(d3.json, 'https://unpkg.com/world-atlas@1/world/110m.json')
@@ -40,6 +43,8 @@ d3.queue()
       .append("path")
       .attr("d", path)
       .attr("class", "border")
+      .style("stroke", "white")
+      .style("fill", "lightgray");
 
     svg.append('g')
       .selectAll('.meteorite')
