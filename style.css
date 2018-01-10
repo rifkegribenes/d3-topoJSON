@@ -3,23 +3,32 @@
 body {
 	font-family: 'Titillium Web', sans-serif;
   margin: 0;
-  padding: 0;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
 }
 
 .water {
   background: #4196f6;
 }
 
-svg {
-  fill: #4196f6;
+.border {
+  stroke: black;
+  stroke-width: 0.15px;
+  fill: #fafafa;
 }
 
-.d3-tip {
+.tooltip {
+  position: absolute;
   line-height: 1;
   color: #fff;
   padding: 12px;
   background: rgba(0, 0, 0, 0.8);
   border-radius: 2px;
+  opacity: 0;
+  width: 150px;
 }
 
 .tip-qty {
@@ -33,7 +42,7 @@ svg {
 	text-align: center;
 }
 
-.d3-tip:after {
+.tooltip:after {
   box-sizing: border-box;
   display: inline;
   font-size: 10px;
@@ -43,9 +52,6 @@ svg {
   content: "\25BC";
   position: absolute;
   text-align: center;
-}
-
-.d3-tip.n:after {
   margin: -1px 0 0 0;
   top: 100%;
   left: 0;
