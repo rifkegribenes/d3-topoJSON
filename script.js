@@ -1,5 +1,6 @@
-const width = window.innerWidth;
-const height = width / 2;
+const initialWidth = window.innerWidth;
+let width = initialWidth;
+let height = width / 2;
 const tooltip = d3.select('body').append('div').attr('class', 'tooltip');
 const metorScale = d3.scalePow().exponent(.5).domain([0, 1000, 10000, 56000, 23000000]);
 
@@ -16,13 +17,22 @@ const projection = d3.geoMercator()
 const path = d3.geoPath().projection(projection);
 
 const water = svg.append('rect')
-  .attr("width", width)
-  .attr("height", height)
+  .attr("class", 'water')
   .style("fill", "#4196f6");
 
 const borders = svg.append("g")
-  .attr('width', width)
-  .attr('height', height)
+  .attr('class', 'borders');
+
+const resize = () => {
+  let width = window.innerWidth;
+  let height = width / 2;
+  svg.attr('width', width).attr('height', height);
+  projection.scale(width / 2 / Math.PI).translate([width / 2, height / 2]);
+  d3.select("g").attr("transform", `scale(${width / initialWidth})`);
+  d3.selectAll("circle")
+    .attr('cx', d => projection([d.properties.reclong, d.properties.reclat])[0])
+    .attr('cy', d => projection([d.properties.reclong,d.properties.reclat])[1]);
+}
 
 
 d3.queue()
@@ -82,3 +92,4 @@ const zoom = d3.zoom()
   .on('zoom', () => d3.selectAll('g').attr('transform', d3.event.transform));
 
 svg.call(zoom);
+d3.select(window).on("resize", resize);
