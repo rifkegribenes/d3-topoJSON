@@ -8,9 +8,15 @@ const meteorScale = d3.scalePow().exponent(.05).domain([0, 1000, 10000, 56000, 1
 const colorScale = d3.scaleLinear().domain([1400, 1800, 1860, 1940, 2015]);
 
 const formatMass = (m) => {
-  let sections = m.toString().split(".");
-  sections[0] = sections[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  return sections.join(".");
+  if (m >= 1000) {
+    let sections = (m / 1000).toString().split(".");
+    sections[0] = sections[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return `${sections.join(".")} kg`;
+  } else {
+    let sections = m.toString().split(".");
+    sections[0] = sections[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return `${sections.join(".")} g`;
+  }
 }
 
 const svg = d3.select('body').append('svg')
@@ -78,7 +84,7 @@ d3.queue()
           tooltip.transition()
             .duration(100)
             .style('opacity', .9);
-          tooltip.html(`<span class="tip-name">${d.properties.name}</span><span class="tip-date">&nbsp;(${year})</span><br><span class="tip-mass">${formatMass(d.properties.mass)} kg</span>`)
+          tooltip.html(`<span class="tip-name">${d.properties.name}</span><span class="tip-date">&nbsp;(${year})</span><br><span class="tip-mass">${formatMass(d.properties.mass)}</span>`)
             .style('left', `${d3.event.pageX - 87}px`)
             // keep tooltips from overlapping with circles
             .style('top', `${d3.event.pageY - (tip.clientHeight + 20)}px`);
