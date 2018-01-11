@@ -1,10 +1,17 @@
 const initialWidth = window.innerWidth;
 let width = initialWidth;
 let height = width / 2;
-const tooltip = d3.select('body').append('div').attr('class', 'tooltip');
-const metorScale = d3.scalePow().exponent(.5).domain([0, 1000, 10000, 56000, 23000000]);
+const tooltip = d3.select('body').append('div').attr('class', 'tooltip').attr('id', 'tip');
+const tip = document.getElementById('tip');
+const meteorScale = d3.scalePow().exponent(.05).domain([0, 1000, 10000, 56000, 100000, 1000000, 23000000]);
 
 const colorScale = d3.scaleLinear().domain([1400, 1800, 1860, 1940, 2015]);
+
+const formatMass = (m) => {
+  let sections = m.toString().split(".");
+  sections[0] = sections[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return sections.join(".");
+}
 
 const svg = d3.select('body').append('svg')
   .attr('width', width)
@@ -15,10 +22,6 @@ const projection = d3.geoMercator()
   .translate([width / 2, height / 2]);
 
 const path = d3.geoPath().projection(projection);
-
-const water = svg.append('rect')
-  .attr("class", 'water')
-  .style("fill", "#4196f6");
 
 const borders = svg.append("g")
   .attr('class', 'borders');
@@ -40,7 +43,7 @@ d3.queue()
   .defer(d3.json, 'https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/meteorite-strike-data.json')
   .await((error, world, meteorites) => {
 
-    metorScale
+    meteorScale
     .range([2.5, 3, 4, 5, 10]);
 
     colorScale
@@ -63,9 +66,7 @@ d3.queue()
         .attr('class', 'meteorite')
         .attr('cx', d => projection([d.properties.reclong, d.properties.reclat])[0])
         .attr('cy', d => projection([d.properties.reclong,d.properties.reclat])[1])
-        // .attr("cx", d => projection([d.long, d.lat])[0])
-        // .attr("cy", d => projection([d.long, d.lat])[1])
-        .attr("r",  d => metorScale(d.properties.mass))
+        .attr("r",  d => meteorScale(d.properties.mass))
         .attr("id", d => `id${d.id}`)
         .attr('fill', d => {
           const year = (new Date(d.properties.year)).getFullYear();
@@ -73,12 +74,14 @@ d3.queue()
         })
         .style('opacity', '0.5')
         .on('mouseover', (d) => {
+          const year = (new Date(d.properties.year)).getFullYear();
           tooltip.transition()
             .duration(100)
             .style('opacity', .9);
-          tooltip.text(`${(new Date(d.properties.year)).getFullYear()} ${d.properties.name} ${d.properties.mass}kg`)
+          tooltip.html(`<span class="tip-name">${d.properties.name}</span><span class="tip-date">&nbsp;(${year})</span><br><span class="tip-mass">${formatMass(d.properties.mass)} kg</span>`)
             .style('left', `${d3.event.pageX - 87}px`)
-            .style('top', `${d3.event.pageY - 80}px`);
+            // keep tooltips from overlapping with circles
+            .style('top', `${d3.event.pageY - (tip.clientHeight + 20)}px`);
         })
         .on('mouseout', () => {
           tooltip.transition()
