@@ -1,8 +1,8 @@
 ## Map Data Across the Globe (Freecodecamp Project)
 
-#### Live: http://rifkegribenes-d3-topojson.surge.sh/
+### Live: http://rifkegribenes-d3-topojson.surge.sh/
 
-### User stories:
+#### User stories:
 
 * I can see where all Meteorites landed on a world map.
 * I can tell the relative size of the meteorite, just by looking at the way it's represented on the map.
