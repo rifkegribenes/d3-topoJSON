@@ -12,6 +12,6 @@
 
 <https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/meteorite-strike-data.json>
 
-#### UI:
+#### Screenshot:
 
 ![map data across the globe (screenshot)](https://raw.githubusercontent.com/rifkegribenes/d3-topoJSON/master/Screen%20Shot%202018-01-15%20at%203.57.27%20PM.png)
